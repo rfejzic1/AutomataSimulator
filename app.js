@@ -115,6 +115,8 @@ class Simulator {
             this.selected = this.nodesList.selectNode(e.offsetX, e.offsetY);
             if(this.selected) {
                 this.dragging = true;
+                let x = this.selected.x;
+                let y = this.selected.y;
                 this.orgPos = {x, y};
                 this.nodesList.bringToTop(this.selected);
             }
@@ -124,10 +126,8 @@ class Simulator {
             if(e.button != 0)
                 return;
             
-            let x = e.offsetX;
-            let y = e.offsetY;
             if(this.selected && this.dragging) {
-                this.selected.setCenter(x, y);                    
+                this.selected.setCenter(e.offsetX, e.offsetY);                    
             }
         });
 
@@ -135,8 +135,8 @@ class Simulator {
             if(e.button != 0)
                 return;
             this.dragging = false;
-            if(this.selected.overlapsAny(this.nodesList.nodes)) {
-                this.selected.setCenter(orgPos.x, orgPos.y);
+            if(this.selected && this.selected.overlapsAny(this.nodesList.nodes)) {
+                this.selected.setCenter(this.orgPos.x, this.orgPos.y);
             }
         });
 
