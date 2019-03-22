@@ -7,6 +7,7 @@ class Node {
         this.y = y;
         this.radius = radius;
         this.name = name;
+        this.links = [];
     }
 
     setCenter(x, y) {
@@ -15,6 +16,18 @@ class Node {
     }
 
     render() {
+        this.links.forEach(node => {
+            this.ctx.strokeStyle = "#333";
+            this.ctx.lineWidth = 3;
+            this.ctx.beginPath();
+            this.ctx.moveTo(this.x, this.y);
+            let angle = Math.atan2(node.y - this.y, node.x - this.x);
+            let px = node.x - this.radius * Math.cos(angle);
+            let py = node.y - this.radius * Math.sin(angle);
+            this.ctx.lineTo(px, py);
+            this.ctx.stroke();
+        });
+
         this.ctx.beginPath();
         this.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
         this.ctx.strokeStyle = "#333";
@@ -62,12 +75,32 @@ class Nodes {
         return null;
     }
 
+    linkNodes(node1, node2) {
+        if(node1.links.indexOf(node2) == -1) {
+            node1.links.push(node2);
+        }
+    }
+
+    unlinkNodes(node1, node2) {
+        let idx = node1.links.indexOf(node2);
+        if(idx != -1) {
+            node1.links.splice(idx, 1);
+        }
+    }
+
     bringToTop(node) {
-        this.removeNode(node);
+        let idx = this.nodes.indexOf(node);
+        if(idx <= -1)
+            return;
+        this.nodes.splice(idx, 1);
         this.nodes.push(node);
     }
 
     removeNode(node) {
+        this.nodes.forEach(n => {
+            this.unlinkNodes(n, node);
+        });
+
         let idx = this.nodes.indexOf(node);
         if(idx <= -1)
             return;
@@ -97,20 +130,22 @@ class Simulator {
 
         canvas.addEventListener("selectstart", e => e.preventDefault());
 
-        canvas.addEventListener("click", e => {
+        canvas.addEventListener("mousedown", e => {
             if(e.button != 0)
                 return;
-            
+
             if(e.ctrlKey) {
                 let node = new Node(this.ctx, e.offsetX, e.offsetY, this.options.nodeRadius, this.max);
                 this.max += 1;
                 this.nodesList.addNode(node);
+                this.selected = this.nodesList.selectNode(e.offsetX, e.offsetY);
+            }else if(e.shiftKey) {
+                if(this.selected) {
+                    let prev = this.selected;
+                    this.selected = this.nodesList.selectNode(e.offsetX, e.offsetY);
+                    this.nodesList.linkNodes(prev, this.selected);
+                }
             }
-        });
-
-        canvas.addEventListener("mousedown", e => {
-            if(e.button != 0)
-                return;
 
             this.selected = this.nodesList.selectNode(e.offsetX, e.offsetY);
             this.dragging = true;
