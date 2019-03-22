@@ -26,6 +26,8 @@ class Node {
             let py = node.y - this.radius * Math.sin(angle);
             this.ctx.lineTo(px, py);
             this.ctx.stroke();
+            this.ctx.lineTo(px - 12 * Math.cos(angle - 6), py - 12 * Math.sin(angle - 6));
+            this.ctx.stroke();
         });
 
         this.ctx.beginPath();
@@ -64,7 +66,7 @@ class Nodes {
             this.nodes.push(node);
         else
             console.log("There is alredy a Node on that position!")
-        return this.nodes.length;
+        return this.nodes[this.nodes.length - 1].name;
     }
 
     selectNode(x, y) {
@@ -137,7 +139,7 @@ class Simulator {
             
             if(e.ctrlKey) {
                 let node = new Node(this.ctx, e.offsetX, e.offsetY, this.options.nodeRadius, this.max);
-                this.max = this.nodesList.addNode(node);
+                this.max = this.nodesList.addNode(node) + 1;
                 this.selected = this.nodesList.selectNode(e.offsetX, e.offsetY);
             }else if(e.shiftKey) {
                 if(this.selected) {
