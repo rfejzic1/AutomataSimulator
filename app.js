@@ -132,9 +132,9 @@ class Simulator {
         canvas.addEventListener("selectstart", e => e.preventDefault());
 
         canvas.addEventListener("mousedown", e => {
-            if(e.button != 0)
+            if(e.button == 2)
                 return;
-
+            
             if(e.ctrlKey) {
                 let node = new Node(this.ctx, e.offsetX, e.offsetY, this.options.nodeRadius, this.max);
                 this.max = this.nodesList.addNode(node);
@@ -143,12 +143,19 @@ class Simulator {
                 if(this.selected) {
                     let prev = this.selected;
                     this.selected = this.nodesList.selectNode(e.offsetX, e.offsetY);
-                    this.nodesList.linkNodes(prev, this.selected);
+                    if(this.selected)
+                        this.nodesList.linkNodes(prev, this.selected);
                 }
+            }else {
+                this.selected = this.nodesList.selectNode(e.offsetX, e.offsetY);
             }
 
-            this.selected = this.nodesList.selectNode(e.offsetX, e.offsetY);
-            this.dragging = true;
+            if(e.button == 1) {
+                this.removeStateHandler();
+            }else {
+                this.dragging = true;
+            }
+            
             if(this.selected) {
                 let x = this.selected.x;
                 let y = this.selected.y;
@@ -201,8 +208,10 @@ class Simulator {
     }
 
     removeStateHandler() {
-        if(this.selected)
+        if(this.selected) {
             this.nodesList.removeNode(this.selected);
+            this.selected = null;
+        }
     }
 
     restart() {
