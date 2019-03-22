@@ -64,6 +64,7 @@ class Nodes {
             this.nodes.push(node);
         else
             console.log("There is alredy a Node on that position!")
+        return this.nodes.length;
     }
 
     selectNode(x, y) {
@@ -136,8 +137,7 @@ class Simulator {
 
             if(e.ctrlKey) {
                 let node = new Node(this.ctx, e.offsetX, e.offsetY, this.options.nodeRadius, this.max);
-                this.max += 1;
-                this.nodesList.addNode(node);
+                this.max = this.nodesList.addNode(node);
                 this.selected = this.nodesList.selectNode(e.offsetX, e.offsetY);
             }else if(e.shiftKey) {
                 if(this.selected) {
