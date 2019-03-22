@@ -111,10 +111,10 @@ class Simulator {
         canvas.addEventListener("mousedown", e => {
             if(e.button != 0)
                 return;
-            
+
             this.selected = this.nodesList.selectNode(e.offsetX, e.offsetY);
+            this.dragging = true;
             if(this.selected) {
-                this.dragging = true;
                 let x = this.selected.x;
                 let y = this.selected.y;
                 this.orgPos = {x, y};
@@ -122,12 +122,15 @@ class Simulator {
             }
         });
 
-        canvas.addEventListener("mousemove", e => {
-            if(e.button != 0)
-                return;
-            
-            if(this.selected && this.dragging) {
-                this.selected.setCenter(e.offsetX, e.offsetY);                    
+        canvas.addEventListener("mousemove", e => {    
+            if(this.dragging) {
+                if(this.selected) {
+                    this.selected.setCenter(e.offsetX, e.offsetY);                    
+                }else {
+                    this.nodesList.nodes.forEach(node => {
+                        node.setCenter(node.x + e.movementX, node.y + e.movementY);
+                    });
+                }
             }
         });
 
